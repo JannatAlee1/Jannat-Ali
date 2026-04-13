@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Redirect Tracker | URL Redirect Checker Tool</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Inter', 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f0f4fa 0%, #e6edf4 100%);
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+    }
+
+    /* main card container */
+    .tool-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(2px);
+      border-radius: 3rem;
+      box-shadow: 0 25px 45px -12px rgba(0,0,0,0.25), 0 1px 2px rgba(0,0,0,0.05);
+      padding: 1.8rem 2rem 2.5rem;
+      transition: all 0.2s ease;
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #1A2A3F, #1e3a5f);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h1::before {
+      content: "🔍";
+      font-size: 2rem;
+      background: none;
+      background-clip: unset;
+      -webkit-background-clip: unset;
+      color: #2c5a7a;
+    }
+
+    .sub {
+      color: #4a627a;
+      margin-top: 0.5rem;
+      margin-bottom: 1.8rem;
+      border-left: 4px solid #2c7da0;
+      padding-left: 1rem;
+      font-weight: 450;
+    }
+
+    /* input area */
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      align-items: flex-start;
+    }
+
+    .url-field {
+      flex: 4;
+      min-width: 240px;
+    }
+
+    .url-field label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #2c4c6e;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .url-input {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      font-size: 1rem;
+      border: 2px solid #cbdde9;
+      border-radius: 2rem;
+      background: white;
+      transition: 0.2s;
+      outline: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .url-input:focus {
+      border-color: #2c7da0;
+      box-shadow: 0 4px 12px rgba(44,125,160,0.15);
+    }
+
+    .options {
+      flex: 1.5;
+      min-width: 180px;
+    }
+
+    .options label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: #2c4c6e;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    select {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border-radius: 2rem;
+      border: 2px solid #cbdde9;
+      background: white;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.85rem 1.8rem;
+      border-radius: 2.5rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.2s;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .btn-primary {
+      background: #1f6392;
+      color: white;
+      box-shadow: 0 5px 12px rgba(31,99,146,0.25);
+    }
+
+    .btn-primary:hover {
+      background: #0f4b70;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #eef3fc;
+      border: 1px solid #bfd7e8;
+      color: #2c5a7a;
+    }
+
+    .btn-secondary:hover {
+      background: #e2edf8;
+    }
+
+    /* status & summary */
+    .status-area {
+      background: #f8fafd;
+      border-radius: 2rem;
+      padding: 1rem 1.6rem;
+      margin-bottom: 1.8rem;
+      border: 1px solid #dce7f0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.8rem;
+    }
+
+    .status-badge {
+      font-weight: 700;
+      font-size: 0.9rem;
+      background: #eef2f8;
+      padding: 0.3rem 1rem;
+      border-radius: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .final-url {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #1f4e6e;
+      word-break: break-all;
+    }
+
+    /* redirect chain table */
+    .chain-section {
+      background: white;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+      margin-top: 0.6rem;
+    }
+
+    .chain-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      padding: 1.2rem 1.5rem 0.5rem 1.5rem;
+    }
+
+    .chain-header h3 {
+      font-weight: 700;
+      color: #1f3b4c;
+      font-size: 1.3rem;
+    }
+
+    .badge-count {
+      background: #d9e6f2;
+      padding: 0.2rem 0.8rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      padding: 0 0 1rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 1rem 1rem 0.7rem 1.5rem;
+      background: #f9fcff;
+      color: #2c5f8a;
+      font-weight: 600;
+      border-bottom: 1px solid #e2edf4;
+    }
+
+    td {
+      padding: 1rem 1rem 1rem 1.5rem;
+      border-bottom: 1px solid #ecf3f9;
+      vertical-align: top;
+      word-break: break-word;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .step-badge {
+      background: #eef2fa;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 60px;
+      font-weight: 700;
+      color: #1f6392;
+    }
+
+    .status-code {
+      font-family: monospace;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      background: #f0f4f9;
+      display: inline-block;
+    }
+
+    .redirect-arrow {
+      font-size: 1.1rem;
+      color: #6c8eae;
+      margin: 0 6px;
+    }
+
+    .final-row {
+      background: #f3f9fe;
+    }
+
+    .error-message {
+      background: #fff5f0;
+      border-left: 5px solid #e67e22;
+      padding: 1rem;
+      border-radius: 1rem;
+      margin: 1rem 0;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 0.7s linear infinite;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #6b89a2;
+    }
+
+    @media (max-width: 760px) {
+      .tool-container {
+        padding: 1.2rem;
+      }
+      th, td {
+        padding: 0.8rem 0.8rem 0.8rem 1rem;
+      }
+      .btn-group {
+        margin-top: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="tool-container">
+  <h1>URL Redirect Inspector</h1>
+  <div class="sub">Trace HTTP redirects (3xx) — see full chain, status codes & final destination</div>
+
+  <div class="input-group">
+    <div class="url-field">
+      <label>🔗 Enter URL (absolute, with http:// or https://)</label>
+      <input type="text" id="urlInput" class="url-input" placeholder="https://example.com  or  https://httpbin.org/redirect/3" value="https://httpbin.org/redirect/4">
+    </div>
+    <div class="options">
+      <label>⚙️ Max redirects limit</label>
+      <select id="maxRedirectsSelect">
+        <option value="10">10 redirects (default)</option>
+        <option value="15">15 redirects</option>
+        <option value="20">20 redirects</option>
+        <option value="5">5 redirects (strict)</option>
+        <option value="25">25 redirects</option>
+      </select>
+    </div>
+    <div class="btn-group">
+      <button id="checkBtn" class="btn btn-primary">🚀 Check Redirects</button>
+      <button id="clearBtn" class="btn btn-secondary">🗑 Clear Results</button>
+    </div>
+  </div>
+
+  <!-- dynamic status -->
+  <div id="statusPanel" class="status-area">
+    <div class="status-badge">⚡ Ready</div>
+    <div class="final-url" id="finalUrlDisplay">—</div>
+  </div>
+
+  <!-- redirect chain table -->
+  <div class="chain-section">
+    <div class="chain-header">
+      <h3>🔄 Redirect Chain</h3>
+      <div class="badge-count" id="hopCount">0 hops</div>
+    </div>
+    <div class="table-wrapper">
+      <table id="redirectTable">
+        <thead>
+          <tr><th>#</th><th>Request URL</th><th>Status</th><th>Location →</th></tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="4" style="text-align:center; padding:2rem;">🔍 No data yet. Enter a URL and click "Check Redirects".</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <footer>⚠️ Works with CORS-enabled endpoints or public APIs (via allorigins.win proxy fallback). Follows 301, 302, 303, 307, 308.</footer>
+</div>
+
+<script>
+  (function() {
+    // DOM elements
+    const urlInput = document.getElementById('urlInput');
+    const checkBtn = document.getElementById('checkBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const maxRedirectsSelect = document.getElementById('maxRedirectsSelect');
+    const tableBody = document.getElementById('tableBody');
+    const hopCountSpan = document.getElementById('hopCount');
+    const finalUrlDisplay = document.getElementById('finalUrlDisplay');
+    const statusPanelBadge = document.querySelector('#statusPanel .status-badge');
+
+    // Helper to update status badge
+    function setStatus(text, isLoading = false) {
+      if (isLoading) {
+        statusPanelBadge.innerHTML = `⏳ ${text} <span class="loader"></span>`;
+      } else {
+        statusPanelBadge.innerHTML = text;
+      }
+    }
+
+    // Clear results
+    function clearResults() {
+      tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:2rem;">✨ No data. Enter a URL and start checking.</td></tr>`;
+      hopCountSpan.innerText = '0 hops';
+      finalUrlDisplay.innerText = '—';
+      setStatus('✅ Ready');
+    }
+
+    // display error friendly
+    function showError(message, details = '') {
+      tableBody.innerHTML = `<tr><td colspan="4" style="background:#fff7f0;"><div class="error-message"><strong>⚠️ ${message}</strong><br>${details ? details : 'Check URL format, CORS or network issues.'}</div></td></tr>`;
+      hopCountSpan.innerText = 'error';
+      finalUrlDisplay.innerText = 'failed';
+      setStatus(`❌ Error: ${message.substring(0, 80)}`);
+    }
+
+    // Normalize URL (add https if missing protocol)
+    function normalizeUrl(raw) {
+      let trimmed = raw.trim();
+      if (!trimmed) return null;
+      if (!/^https?:\/\//i.test(trimmed)) {
+        trimmed = 'https://' + trimmed;
+      }
+      try {
+        new URL(trimmed);
+        return trimmed;
+      } catch(e) {
+        return null;
+      }
+    }
+
+    // Core redirect tracking with fetch & manual following (to capture each step)
+    async function traceRedirects(startUrl, maxHops) {
+      let chain = [];      // each entry { url, status, location }
+      let currentUrl = startUrl;
+      let hops = 0;
+      let finalUrl = startUrl;
+      let finalStatus = null;
+
+      // we'll use fetch with redirect: 'manual' to intercept every step
+      // BUT note: manual redirect mode doesn't automatically follow; we need to extract Location header.
+      // Also fetch API may throw network errors; we'll handle gracefully.
+      while (hops <= maxHops) {
+        let response;
+        try {
+          // We'll use a proxy only if needed? But we try direct fetch first with no-cors mode issues.
+          // Better: use fetch with redirect: 'manual' to read Location headers across origins.
+          // However due to CORS, some servers may block reading Location header from cross-origin.
+          // To increase reliability, we'll implement a fallback proxy (allorigins) when we suspect CORS blocks?
+          // But for typical redirect tracing, manual fetch + mode 'cors' might fail if server doesn't set ACAO.
+          // We'll implement a smart hybrid: first attempt direct fetch (mode: 'cors', redirect: 'manual'),
+          // if that fails due to network / CORS, we retry via a CORS proxy (allorigins) that fetches and gives headers.
+          // For clean UX, we first try normal fetch, and if fails, fallback to proxy.
+          response = await directFetchWithManualRedirect(currentUrl);
+        } catch (err) {
+          // Fallback to proxy-based fetch to retrieve headers
+          console.warn("Direct fetch failed, trying CORS proxy fallback", err);
+          try {
+            response = await proxyFetchWithManualRedirect(currentUrl);
+          } catch (proxyErr) {
+            throw new Error(`Cannot fetch URL: ${proxyErr.message}. Server may be down or blocked.`);
+          }
+        }
+
+        const status = response.status;
+        const isRedirect = (status >= 300 && status < 400 && status !== 304 && status !== 306);
+        let locationHeader = null;
+        
+        if (isRedirect) {
+          locationHeader = response.headers.get('location');
+          if (!locationHeader) {
+            // malformed redirect without location
+            chain.push({
+              url: currentUrl,
+              status: status,
+              location: '(missing Location header, stop)'
+            });
+            finalUrl = currentUrl;
+            finalStatus = status;
+            break;
+          }
+          // resolve relative location
+          let resolvedLocation;
+          try {
+            resolvedLocation = new URL(locationHeader, currentUrl).href;
+          } catch(e) {
+            resolvedLocation = locationHeader; // fallback raw
+          }
+          chain.push({
+            url: currentUrl,
+            status: status,
+            location: resolvedLocation
+          });
+          // Prepare next iteration
+          currentUrl = resolvedLocation;
+          finalUrl = currentUrl;
+          finalStatus = status;
+          hops++;
+          continue;
+        } else {
+          // not a redirect -> terminal
+          chain.push({
+            url: currentUrl,
+            status: status,
+            location: null   // final response
+          });
+          finalUrl = currentUrl;
+          finalStatus = status;
+          break;
+        }
+      }
+
+      // if we exceeded max hops without terminating
+      if (hops > maxHops) {
+        chain.push({
+          url: currentUrl,
+          status: 'MAX_HOPS',
+          location: `Reached limit of ${maxHops} redirects`
+        });
+        finalUrl = currentUrl;
+      }
+      return { chain, finalUrl, finalStatus };
+    }
+
+    // Direct fetch with redirect: 'manual' (respects CORS but may fail)
+    async function directFetchWithManualRedirect(url) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      try {
+        const res = await fetch(url, {
+          method: 'GET',
+          redirect: 'manual',
+          mode: 'cors',
+          credentials: 'omit',
+          signal: controller.signal,
+          headers: { 'User-Agent': 'RedirectChecker/1.0' }
+        });
+        clearTimeout(timeoutId);
+        return res;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        throw err;
+      }
+    }
+
+    // CORS-agnostic proxy (allorigins) to fetch headers and body info; we reconstruct response like object
+    async function proxyFetchWithManualRedirect(url) {
+      // Using allorigins.win to get response headers (including location) safely
+      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+      // But we need headers, not just raw body. However allorigins returns headers inside metadata if we use get?
+      // Use "https://api.allorigins.win/get?url=..." to get json with status and headers.
+      const proxyMetaUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      try {
+        const resp = await fetch(proxyMetaUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (!resp.ok) throw new Error(`Proxy error HTTP ${resp.status}`);
+        const data = await resp.json();
+        // data structure: { contents, status, headers }
+        const rawStatus = data.status?.http_code || 500;
+        const headersRaw = data.headers || {};
+        // Build a headers map
+        const headersMap = new Map();
+        for (const [k, v] of Object.entries(headersRaw)) {
+          headersMap.set(k.toLowerCase(), String(v));
+        }
+        // reconstruct a fake Response object with needed methods
+        const fakeResponse = {
+          status: rawStatus,
+          headers: {
+            get: (name) => headersMap.get(name.toLowerCase()) || null
+          },
+          ok: rawStatus >= 200 && rawStatus < 300
+        };
+        return fakeResponse;
+      } catch(err) {
+        clearTimeout(timeoutId);
+        throw new Error(`Proxy failed: ${err.message}`);
+      }
+    }
+
+    // Render chain into table
+    function renderChain(chain, finalUrl, finalStatus, maxHopsConfigured) {
+      if (!chain.length) {
+        tableBody.innerHTML = `<tr><td colspan="4">No redirect steps captured.</td></tr>`;
+        hopCountSpan.innerText = '0 hops';
+        finalUrlDisplay.innerText = finalUrl || '—';
+        return;
+      }
+
+      const rowsHtml = [];
+      let redirectCount = 0;
+      for (let i = 0; i < chain.length; i++) {
+        const step = chain[i];
+        const isLast = (i === chain.length - 1);
+        const stepNumber = i + 1;
+        let statusText = step.status;
+        let locationCell = '';
+        
+        if (step.location === null && isLast) {
+          locationCell = `<span style="color:#2b7a4b;">✓ Final destination (no redirect)</span>`;
+        } 
+        else if (step.location && !isLast) {
+          locationCell = `<span class="redirect-arrow">↳</span> <strong style="word-break:break-all;">${escapeHtml(step.location)}</strong>`;
+          redirectCount++;
+        } 
+        else if (step.location && isLast && step.status !== 'MAX_HOPS') {
+          locationCell = `<span class="redirect-arrow">➔</span> ${escapeHtml(step.location)} <span style="background:#e0f0e8; padding:2px 8px; border-radius:20px;">final hop</span>`;
+          redirectCount++;
+        }
+        else if (step.status === 'MAX_HOPS') {
+          statusText = '⚠️ Limit Exceeded';
+          locationCell = `<span style="color:#c0392b;">${escapeHtml(step.location)}</span>`;
+        }
+        else {
+          locationCell = '—';
+        }
+
+        let statusCodeHtml = `<span class="status-code">${statusText}</span>`;
+        if (step.status >= 300 && step.status < 400 && step.status !== 'MAX_HOPS') {
+          statusCodeHtml = `<span class="status-code" style="background:#fee2c0; color:#b45f06;">${step.status} (Redirect)</span>`;
+        } else if (step.status >= 200 && step.status < 300 && !isNaN(step.status)) {
+          statusCodeHtml = `<span class="status-code" style="background:#dcfce7; color:#15803d;">${step.status} OK</span>`;
+        } else if (step.status >= 400 && !isNaN(step.status)) {
+          statusCodeHtml = `<span class="status-code" style="background:#ffe0db; color:#bc3900;">${step.status} Error</span>`;
+        }
+
+        rowsHtml.push(`
+          <tr class="${isLast && !step.location ? 'final-row' : ''}">
+            <td style="width: 60px;"><span class="step-badge">${stepNumber}</span></td>
+            <td style="max-width: 350px; word-break: break-all;">${escapeHtml(step.url)}</td>
+            <td style="width: 110px;">${statusCodeHtml}</td>
+            <td style="word-break: break-all;">${locationCell || '—'}</td>
+          </tr>
+        `);
+      }
+
+      tableBody.innerHTML = rowsHtml.join('');
+      const totalHops = redirectCount;
+      hopCountSpan.innerText = `${totalHops} redirect hop${totalHops !== 1 ? 's' : ''}`;
+      
+      let finalPretty = finalUrl;
+      if (finalStatus && finalStatus >= 200 && finalStatus < 400) {
+        finalUrlDisplay.innerHTML = `🏁 ${escapeHtml(finalPretty)} <span style="font-size:0.7rem;">(HTTP ${finalStatus})</span>`;
+      } else {
+        finalUrlDisplay.innerHTML = escapeHtml(finalPretty);
+      }
+      setStatus(`✅ Completed — ${totalHops} redirect(s) traced`);
+    }
+
+    // simple escape
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+      }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+        return c;
+      });
+    }
+
+    // main action
+    async function startRedirectCheck() {
+      let rawUrl = urlInput.value;
+      if (!rawUrl) {
+        showError('Empty URL', 'Please enter a valid URL (e.g., https://example.com)');
+        return;
+      }
+      const normalized = normalizeUrl(rawUrl);
+      if (!normalized) {
+        showError('Invalid URL format', 'URL must include domain, e.g., https://example.com or httpbin.org');
+        return;
+      }
+      urlInput.value = normalized;
+      const maxRedirects = parseInt(maxRedirectsSelect.value, 10);
+      setStatus(`Tracing ${normalized} ...`, true);
+      tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:2rem;"><span class="loader" style="border-color:#2c7da0; border-top-color:transparent;"></span> Following redirect chain...</td></tr>`;
+      hopCountSpan.innerText = '...';
+      finalUrlDisplay.innerText = 'analyzing...';
+
+      try {
+        const { chain, finalUrl, finalStatus } = await traceRedirects(normalized, maxRedirects);
+        if (!chain.length) throw new Error('No redirect data received');
+        renderChain(chain, finalUrl, finalStatus, maxRedirects);
+      } catch (err) {
+        console.error(err);
+        let errMsg = err.message || 'Unknown network/CORS error';
+        if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError')) {
+          errMsg = 'Network / CORS issue: The URL may block requests. Try a public URL or enable CORS proxy fallback (auto-used).';
+        }
+        showError('Redirect check failed', errMsg);
+      }
+    }
+
+    // event listeners
+    checkBtn.addEventListener('click', () => startRedirectCheck());
+    clearBtn.addEventListener('click', () => {
+      urlInput.value = '';
+      clearResults();
+    });
+    // optional: initial example demo? show placeholder chain for demo not needed, but set ready.
+    clearResults();
+
+    // Load example URL from placeholder if needed
+    if (urlInput.value === 'https://httpbin.org/redirect/4') {
+      // but no auto-run, user clicks.
+    }
+  })();
+</script>
+</body>
+</html>
